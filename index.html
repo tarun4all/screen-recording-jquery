@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Users activity recoding</title>
+	<style>
+		div.cursor {
+		  position: absolute;
+		  width: 32px;
+		  top: -100%;
+		  height: 32px;
+		  background-image: url(http://cursor.in/assets/cursor.svg);
+		}
+
+		div.obstacle {
+		  width: 10px;
+		  height: 10px;
+		  background: red;
+		  left: 50%;
+		  position: absolute;
+		  top: 50%;
+		}
+	</style>
+	<script
+	  src="https://code.jquery.com/jquery-3.4.1.min.js"
+	  integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
+	  crossorigin="anonymous"></script>
+</head>
+<body>
+	<div class="cursor"></div>
+	<button class="p" onclick="recorder.playback()">stop & play</button>
+	<button class="r" onclick="recorder.record()">record</button>
+
+	<div class="obstacle"></div>
+
+	<script type="text/javascript">
+		var recorder = {
+		    
+		    moveListener:function() {
+		      var that = this;
+
+		      $(window).mousemove(function(e) {
+		        if(that.state == 1) {
+		          that.frames.push([e.clientX, e.clientY]);
+		        }
+		      });
+		    },
+
+		    record:function() {
+		      var that = this;
+		      that.frames = [];
+		      that.state = 1;
+		      that.startTime = new Date().getTime()/1000;
+		        
+		      $('button.r').text('recording..');
+		      $('button.p').text('stop & play');
+		      
+		    },
+
+		    playback:function() {
+		      var that = this;
+		      that.state = 2;
+		      
+		      $('button.r').text('record');
+		      $('button.p').text('playing..');
+
+		      that.endTime = new Date().getTime()/1000;
+		      that.time = (that.endTime - that.startTime) * 3;
+
+		      $(that.frames).each(function(i, move) {
+		        setTimeout(function() {
+		          $('div.cursor').css({
+		            left: move[0],
+		            top: move[1]
+		          });
+		          
+		          if(i == that.frames.length-1) {
+		            $('.p').text('stop & play');
+		          }
+
+		        }, (that.time * i));
+
+		      });
+		    }
+
+		};
+
+		recorder.state = 2; //1 = Recording | 2 = Stopped
+		recorder.frames = [];
+
+		/*
+		 * Listen for the mouse movements
+		 */
+		recorder.moveListener();
+	</script>
+</body>
+</html>
